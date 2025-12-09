@@ -1,69 +1,123 @@
-# :package_description
+# Eloquent Hashids
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/:vendor_slug/:package_slug/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/:vendor_slug/:package_slug/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/:vendor_slug/:package_slug/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/:vendor_slug/:package_slug/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-<!--delete-->
----
-This repo can be used to scaffold a Laravel package. Follow these steps to get started:
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/dialloibrahima/eloquent-hashids.svg?style=flat-square)](https://packagist.org/packages/dialloibrahima/eloquent-hashids)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/ibra379/eloquent-hashids/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ibra379/eloquent-hashids/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/dialloibrahima/eloquent-hashids.svg?style=flat-square)](https://packagist.org/packages/dialloibrahima/eloquent-hashids)
 
-1. Press the "Use this template" button at the top of this repo to create a new repo with the contents of this skeleton.
-2. Run "php ./configure.php" to run a script that will replace all placeholders throughout all the files.
-3. Have fun creating your package.
-4. If you need help creating a package, consider picking up our <a href="https://laravelpackage.training">Laravel Package Training</a> video course.
----
-<!--/delete-->
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+A Laravel package that automatically obfuscates Eloquent model IDs in URLs by converting them to reversible hash strings. This improves security and aesthetics by hiding sequential database IDs.
 
-## Support us
+## Features
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/:package_name.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/:package_name)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+- ✅ **Zero dependencies** - Uses a custom Base62 encoder
+- ✅ **Automatic route model binding** - Works seamlessly with Laravel routes
+- ✅ **Reversible hashes** - Decode hashids back to original IDs
+- ✅ **Per-model configuration** - Customize prefix, suffix, length per model
+- ✅ **Laravel 10, 11, 12 support**
 
 ## Installation
 
-You can install the package via composer:
-
 ```bash
-composer require :vendor_slug/:package_slug
+composer require dialloibrahima/eloquent-hashids
 ```
 
-You can publish and run the migrations with:
+Publish the config file:
 
 ```bash
-php artisan vendor:publish --tag=":package_slug-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag=":package_slug-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag=":package_slug-views"
+php artisan vendor:publish --tag="eloquent-hashids-config"
 ```
 
 ## Usage
 
+### Basic Usage
+
+Add the `Hashidable` trait to your model:
+
 ```php
-$variable = new VendorName\Skeleton();
-echo $variable->echoPhrase('Hello, VendorName!');
+use DialloIbrahima\EloquentHashids\Hashidable;
+
+class User extends Model
+{
+    use Hashidable;
+}
 ```
+
+Now you can use hashids in your URLs:
+
+```php
+// Get the hashid
+$user->hashid; // "aBcD3FgH1jKlM4nP"
+
+// Find by hashid
+User::findByHashid('aBcD3FgH1jKlM4nP');
+User::findByHashidOrFail('aBcD3FgH1jKlM4nP');
+
+// Route model binding works automatically
+Route::get('/users/{user}', function (User $user) {
+    return $user;
+});
+// URL: /users/aBcD3FgH1jKlM4nP
+```
+
+### Per-Model Configuration
+
+Implement `HashidableConfigInterface` to customize hashids per model:
+
+```php
+use DialloIbrahima\EloquentHashids\Contracts\HashidableConfigInterface;
+use DialloIbrahima\EloquentHashids\Hashidable;
+
+class Invoice extends Model implements HashidableConfigInterface
+{
+    use Hashidable;
+
+    public function hashidableConfig(): array
+    {
+        return [
+            'prefix' => 'inv',
+            'suffix' => 'v1',
+            'length' => 12,
+            'separator' => '_',
+        ];
+    }
+}
+
+// Result: inv_aBcD3FgH_v1
+```
+
+### API Resources
+
+Expose hashids in your API responses:
+
+```php
+class UserResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->hashid,
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
+    }
+}
+```
+
+## Configuration
+
+```php
+// config/eloquent-hashids.php
+
+return [
+    'length' => 16,           // Minimum hashid length
+    'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    'salt' => env('HASHID_SALT', env('APP_KEY', '')),
+    'prefix' => '',           // Optional prefix
+    'suffix' => '',           // Optional suffix
+    'separator' => '-',       // Separator for prefix/suffix
+];
+```
+
+> ⚠️ **Warning**: Changing the `salt` will invalidate all existing hashids!
 
 ## Testing
 
@@ -71,22 +125,28 @@ echo $variable->echoPhrase('Hello, VendorName!');
 composer test
 ```
 
-## Changelog
+## Security
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+Hashids provide **obfuscation, not encryption**. They:
 
-## Contributing
+- ✅ Hide sequential IDs
+- ✅ Prevent URL enumeration
+- ❌ Are NOT cryptographically secure
+- ❌ Do NOT replace authentication/authorization
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Always use proper authorization in your controllers:
 
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+```php
+public function show(User $user)
+{
+    $this->authorize('view', $user);
+    return $user;
+}
+```
 
 ## Credits
 
-- [:author_name](https://github.com/:author_username)
-- [All Contributors](../../contributors)
+- [Ibrahima Diallo](https://github.com/ibra379)
 
 ## License
 
