@@ -10,7 +10,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "ibrahima Diallo",
+            "name": "Ibrahima Diallo",
             "email": "idiallo379@gmail.com",
             "role": "Developer"
         }
@@ -37,8 +37,7 @@
     },
     "autoload": {
         "psr-4": {
-            "DialloIbrahima\\EloquentHashids\\": "src/",
-            "DialloIbrahima\\EloquentHashids\\Database\\Factories\\": "database/factories/"
+            "DialloIbrahima\\EloquentHashids\\": "src/"
         }
     },
     "autoload-dev": {
@@ -66,10 +65,7 @@
         "laravel": {
             "providers": [
                 "DialloIbrahima\\EloquentHashids\\EloquentHashidsServiceProvider"
-            ],
-            "aliases": {
-                "EloquentHashids": "DialloIbrahima\\EloquentHashids\\Facades\\EloquentHashids"
-            }
+            ]
         }
     },
     "minimum-stability": "stable",

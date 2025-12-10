@@ -10,16 +10,16 @@ namespace DialloIbrahima\EloquentHashids;
  */
 class HashidEncoder
 {
-    private const DEFAULT_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    private const string DEFAULT_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
     private string $alphabet;
 
     private int $minLength;
 
     public function __construct(
-        private string $salt = '',
-        int $minLength = 16,
-        ?string $alphabet = null
+        private readonly string $salt = '',
+        int                     $minLength = 16,
+        ?string                 $alphabet = null
     ) {
         $this->minLength = max(1, $minLength);
         $this->alphabet = $this->shuffleAlphabet($alphabet ?? self::DEFAULT_ALPHABET);
