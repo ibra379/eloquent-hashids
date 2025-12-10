@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 /**
  * Trait to add hashid functionality to Eloquent models.
  *
+ * @property-read string $hashid The hashid for this model
+ *
  * @mixin Model
  */
 trait Hashidable
@@ -49,7 +51,25 @@ trait Hashidable
             return $this->where($field, $value)->first();
         }
 
-        $id = $this->decodeHashid($value);
+        return $this->resolveHashidRouteBinding($value);
+    }
+
+    /**
+     * Resolve a hashid route binding.
+     * 
+     * Use this method in your own resolveRouteBinding() if you need custom logic:
+     * 
+     * public function resolveRouteBinding($value, $field = null): ?Model
+     * {
+     *     // Your custom logic here...
+     *     return $this->resolveHashidRouteBinding($value);
+     * }
+     *
+     * @param  mixed  $value
+     */
+    public function resolveHashidRouteBinding(mixed $value): ?Model
+    {
+        $id = $this->decodeHashid((string) $value);
 
         if ($id === null) {
             return null;

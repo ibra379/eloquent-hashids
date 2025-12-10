@@ -119,6 +119,25 @@ return [
 ];
 ```
 
+### Custom Route Binding
+
+If your model already has a custom `resolveRouteBinding()`, use the helper method:
+
+```php
+class User extends Model
+{
+    use Hashidable;
+
+    public function resolveRouteBinding($value, $field = null): ?Model
+    {
+        // Your custom logic here...
+        
+        // Then resolve the hashid
+        return $this->resolveHashidRouteBinding($value);
+    }
+}
+```
+
 > ⚠️ **Warning**: Changing the `salt` will invalidate all existing hashids!
 
 ## Testing
