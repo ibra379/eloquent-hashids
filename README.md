@@ -1,8 +1,10 @@
 # Eloquent Hashids
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/dialloibrahima/eloquent-hashids.svg?style=flat-square)](https://packagist.org/packages/dialloibrahima/eloquent-hashids)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/ibra379/eloquent-hashids/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ibra379/eloquent-hashids/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/dialloibrahima/eloquent-hashids.svg?style=flat-square)](https://packagist.org/packages/dialloibrahima/eloquent-hashids)
+[![PHP Version](https://img.shields.io/packagist/php-v/dialloibrahima/eloquent-hashids.svg?style=flat-square)](https://packagist.org/packages/dialloibrahima/eloquent-hashids)
+[![License](https://img.shields.io/packagist/l/dialloibrahima/eloquent-hashids.svg?style=flat-square)](https://packagist.org/packages/dialloibrahima/eloquent-hashids)
+
 
 A Laravel package that automatically obfuscates Eloquent model IDs in URLs by converting them to reversible hash strings. This improves security and aesthetics by hiding sequential database IDs.
 
