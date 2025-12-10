@@ -65,7 +65,7 @@ test('hashid is reversible', function () {
 });
 
 test('per-model config works correctly', function () {
-    $customModel = CustomConfigModel::create(['name' => 'Custom']);
+    $customModel = CustomConfigModel::query()->create(['name' => 'Custom']);
     $hashid = $customModel->hashid;
 
     // Should have prefix and suffix
